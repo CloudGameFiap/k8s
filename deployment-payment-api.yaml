@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: cloudgamepaymentapi
-          image: phsvicero/payment-api:latest
+          image: dpsnbsb79/payment-api:latest
           imagePullPolicy: Always
           ports:
             - name: http
