@@ -21,7 +21,7 @@ spec:
           command: ['sh', '-c', 'until nc -z sqlserver 1433; do echo waiting for sqlserver; sleep 2; done']
       containers:
         - name: user-api
-          image: dpsnbsb79/cloudgamefiapuserapi:1.0
+          image: dpsnbsb79/cloudgamefiapuserapi:2.0
           resources:
             limits:
               memory: "128Mi"
@@ -33,3 +33,17 @@ spec:
                 name: user-api-config
             - secretRef:
                 name: user-api-secret
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 30          
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 20
