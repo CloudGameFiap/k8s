@@ -35,7 +35,7 @@ spec:
             - name: MSSQL_SA_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: payment-api-secret
+                  name: infra-secret
                   key: MSSQL_SA_PASSWORD
           volumeMounts:
             - name: sql-data
