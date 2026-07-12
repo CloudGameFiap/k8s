@@ -22,6 +22,13 @@ spec:
       containers:
         - name: cloudgamepaymentapi
           image: dpsnbsb79/payment-api:latest
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "1000m"
           imagePullPolicy: Always
           ports:
             - name: http

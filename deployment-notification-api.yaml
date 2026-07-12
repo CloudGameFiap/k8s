@@ -24,9 +24,12 @@ spec:
         - name:  notification-api 
           image:  danielrsantos/notifiationapi:5
           resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
             limits:
-              memory: "128Mi"
-              cpu: "500m"
+              memory: "512Mi"
+              cpu: "1000m"
           ports: 
             - containerPort:  8080
           envFrom:
