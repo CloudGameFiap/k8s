@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cloudgamepaymentapi
+  name: payment-api
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: cloudgamepaymentapi
+      app: payment-api
   template:
     metadata:
       labels:
-        app: cloudgamepaymentapi
+        app: payment-api
     spec:
       initContainers:
         - name: wait-for-rabbitmq
@@ -20,8 +20,8 @@ spec:
           image: busybox:1.36
           command: ['sh', '-c', 'until nc -z sqlserver 1433; do echo waiting for sqlserver; sleep 2; done']
       containers:
-        - name: cloudgamepaymentapi
-          image: dpsnbsb79/payment-api:latest
+        - name: payment-api
+          image: igordeandradetudisco/payment-api:latest
           resources:
             requests:
               memory: "512Mi"
