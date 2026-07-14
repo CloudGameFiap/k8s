@@ -21,7 +21,7 @@ spec:
           command: ['sh', '-c', 'until nc -z sqlserver 1433; do echo waiting for sqlserver; sleep 2; done']
       containers:
         - name: payment-api
-          image: igordeandradetudisco/payment-api:latest
+          image: dpsnbsb79/payment-api:3.0
           resources:
             requests:
               memory: "512Mi"
