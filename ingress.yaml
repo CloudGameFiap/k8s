@@ -35,7 +35,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: cloudgamepaymentapi
+                name: payment-api
                 port:
                   number: 80
 

@@ -22,7 +22,7 @@ spec:
           command: ['sh', '-c', 'until nc -z rabbitmq 5672; do echo waiting for rabbitmq; sleep 2; done']          
       containers: 
         - name:  notification-api 
-          image:  danielrsantos/notifiationapi:5
+          image: dpsnbsb79/cloudgamefiapunotificationapi:2.0
           resources:
             requests:
               memory: "512Mi"

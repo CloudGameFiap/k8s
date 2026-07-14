@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: cloudgamepaymentapi
+  name: payment-api
 spec:
   type: ClusterIP
   selector:
-    app: cloudgamepaymentapi
+    app: payment-api
   ports:
     - name: http
       port: 80
