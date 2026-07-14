@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   paymentapi:
-    image: dpsnbsb79/payment-api:latest
+    image: dpsnbsb79/payment-api:3.0
     container_name: cloudgame-paymentapi
     ports:
       - '8082:8080'
@@ -21,7 +21,7 @@ services:
       - cloudgame-network
 
   notificationapi:
-    image: danielrsantos/notifiationapi:5
+    image: dpsnbsb79/cloudgamefiapnotificationapi:5.0
     container_name: cloudgame-notificationapi
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -34,7 +34,7 @@ services:
       - cloudgame-network
 
   catalogapi:
-    image: dpsnbsb79/cloudgamefiapcatalogconsumer:2.0
+    image: dpsnbsb79/cloudgamefiapcatalogconsumer:3.0
     container_name: cloudgame-catalogapi
     ports:
       - '57398:8080'
