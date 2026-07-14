@@ -11,6 +11,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
       - ConnectionStrings__CloudGameDb=${ConnectionStrings__PaymentsApi}
+      # RabbitMQ Settings
       - RabbitMq__Host=${RabbitMq__Host}
       - RabbitMq__Port=${RabbitMq__Port}
       - RabbitMq__Username=${RabbitMq__Username}
@@ -75,32 +76,32 @@ services:
     container_name: cloudgame-consumer
     environment:
       # Logging Settings
-      - Logging__LogLevel__Default: "Information"
-      - Logging__LogLevel__Microsoft.Hosting.Lifetime: "Information"
+      - Logging__LogLevel__Default= "Information"
+      - Logging__LogLevel__Microsoft.Hosting.Lifetime= "Information"
       # Database connection string
-      - ConnectionStrings__Default: ${ConnectionStrings__CatalogApi}
+      - ConnectionStrings__Default= ${ConnectionStrings__CatalogApi}
       # RabbitMQ Settings
-      - RabbitMq__Host: ${RabbitMq__Host}
-      - RabbitMq__Port: ${RabbitMq__Port}
-      - RabbitMq__Username: ${RabbitMq__Username}
-      - RabbitMq__Password: ${RabbitMq__Password}
-      - # Default User data
-      - AppDefaultUserAdmin__Email: ${AppDefaultUserAdmin__Email}
-      - AppDefaultUserAdmin__Password: ${AppDefaultUserAdmin__Password}
-      - AppDefaultUserAdmin__Name: ${AppDefaultUserAdmin__Name}
+      - RabbitMq__Host= ${RabbitMq__Host}
+      - RabbitMq__Port= ${RabbitMq__Port}
+      - RabbitMq__Username= ${RabbitMq__Username}
+      - RabbitMq__Password= ${RabbitMq__Password}
+      # Default User data
+      - AppDefaultUserAdmin__Email= ${AppDefaultUserAdmin__Email}
+      - AppDefaultUserAdmin__Password= ${AppDefaultUserAdmin__Password}
+      - AppDefaultUserAdmin__Name= ${AppDefaultUserAdmin__Name}
       # Serilog
-      - Serilog__MinimumLevel__Default: ${Serilog__MinimumLevel__Default}
-      - Serilog__MinimumLevel__Override__Microsoft: ${Serilog__MinimumLevel__Override__Microsoft}
-      - Serilog__MinimumLevel__Override__System: ${Serilog__MinimumLevel__Override__System}
-      - Serilog__WriteTo__0__Name: ${Serilog__WriteTo__0__Name}
-      - Serilog__WriteTo__1__Name: ${Serilog__WriteTo__1__Name}
-      - Serilog__WriteTo__1__Args__path: ${Serilog__WriteTo__1__Args__path}
-      - Serilog__WriteTo__1__Args__rollingInterval: ${Serilog__WriteTo__1__Args__rollingInterval}
-      - Serilog__WriteTo__1__Args__retainedFileCountLimit: ${Serilog__WriteTo__1__Args__retainedFileCountLimit}
-      - Serilog__WriteTo__1__Args__outputTemplate: ${Serilog__WriteTo__1__Args__outputTemplate}
-      - Serilog__Enrich__0: ${Serilog__Enrich__0}
-      - Serilog__Enrich__1: ${Serilog__Enrich__1}
-      - Serilog__Enrich__2: ${Serilog__Enrich__2}
+      - Serilog__MinimumLevel__Default= ${Serilog__MinimumLevel__Default}
+      - Serilog__MinimumLevel__Override__Microsoft= ${Serilog__MinimumLevel__Override__Microsoft}
+      - Serilog__MinimumLevel__Override__System= ${Serilog__MinimumLevel__Override__System}
+      - Serilog__WriteTo__0__Name= ${Serilog__WriteTo__0__Name}
+      - Serilog__WriteTo__1__Name= ${Serilog__WriteTo__1__Name}
+      - Serilog__WriteTo__1__Args__path= ${Serilog__WriteTo__1__Args__path}
+      - Serilog__WriteTo__1__Args__rollingInterval= ${Serilog__WriteTo__1__Args__rollingInterval}
+      - Serilog__WriteTo__1__Args__retainedFileCountLimit= ${Serilog__WriteTo__1__Args__retainedFileCountLimit}
+      - Serilog__WriteTo__1__Args__outputTemplate= ${Serilog__WriteTo__1__Args__outputTemplate}
+      - Serilog__Enrich__0= ${Serilog__Enrich__0}
+      - Serilog__Enrich__1= ${Serilog__Enrich__1}
+      - Serilog__Enrich__2= ${Serilog__Enrich__2}
 
   userapi:
     image: dpsnbsb79/cloudgamefiapuserapi:2.0
