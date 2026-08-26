@@ -1,0 +1,220 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: grafana-admin
+type: Opaque
+stringData:
+  username: admin
+  password: admin123
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    scrape_configs:
+      - job_name: user-api
+        metrics_path: /metrics
+        static_configs:
+          - targets: ["user-api:80"]
+
+      - job_name: catalog-api
+        metrics_path: /metrics
+        static_configs:
+          - targets: ["catalog-api:80"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v3.5.0
+          args:
+            - --config.file=/etc/prometheus/prometheus.yml
+          ports:
+            - name: http
+              containerPort: 9090
+          volumeMounts:
+            - name: config
+              mountPath: /etc/prometheus
+      volumes:
+        - name: config
+          configMap:
+            name: prometheus-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+spec:
+  type: ClusterIP
+  selector:
+    app: prometheus
+  ports:
+    - name: http
+      port: 9090
+      targetPort: 9090
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasource
+data:
+  prometheus.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        uid: prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus:9090
+        isDefault: true
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-provider
+data:
+  provider.yaml: |
+    apiVersion: 1
+    providers:
+      - name: CloudGame
+        folder: CloudGame
+        type: file
+        options:
+          path: /var/lib/grafana/dashboards
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard
+data:
+  cloudgame-apis.json: |
+    {
+      "annotations": {"list": []},
+      "editable": true,
+      "panels": [
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {"defaults": {"unit": "reqps"}, "overrides": []},
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+          "id": 1,
+          "targets": [{"expr": "sum(rate(http_requests_received_total[5m])) by (job)", "legendFormat": "{{job}}", "refId": "A"}],
+          "title": "Requisições por segundo",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {"defaults": {"unit": "s"}, "overrides": []},
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+          "id": 2,
+          "targets": [{"expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, job))", "legendFormat": "{{job}}", "refId": "A"}],
+          "title": "Latência p95",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {"defaults": {}, "overrides": []},
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+          "id": 3,
+          "targets": [{"expr": "sum(rate(http_requests_received_total[5m])) by (job, code)", "legendFormat": "{{job}} - HTTP {{code}}", "refId": "A"}],
+          "title": "Requisições por status HTTP",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {"defaults": {"unit": "percent"}, "overrides": []},
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+          "id": 4,
+          "targets": [{"expr": "100 * sum(rate(http_requests_received_total{code=~\"4..|5..\"}[5m])) by (job) / sum(rate(http_requests_received_total[5m])) by (job)", "legendFormat": "{{job}}", "refId": "A"}],
+          "title": "Taxa de erros HTTP",
+          "type": "timeseries"
+        }
+      ],
+      "refresh": "10s",
+      "schemaVersion": 41,
+      "tags": ["cloudgame", "prometheus"],
+      "time": {"from": "now-15m", "to": "now"},
+      "timezone": "browser",
+      "title": "CloudGame APIs Observability",
+      "uid": "cloudgame-apis",
+      "version": 1
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana:12.1.0
+          ports:
+            - name: http
+              containerPort: 3000
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-admin
+                  key: username
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-admin
+                  key: password
+          volumeMounts:
+            - name: datasource
+              mountPath: /etc/grafana/provisioning/datasources
+            - name: dashboard-provider
+              mountPath: /etc/grafana/provisioning/dashboards
+            - name: dashboard
+              mountPath: /var/lib/grafana/dashboards
+      volumes:
+        - name: datasource
+          configMap:
+            name: grafana-datasource
+        - name: dashboard-provider
+          configMap:
+            name: grafana-dashboard-provider
+        - name: dashboard
+          configMap:
+            name: grafana-dashboard
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+spec:
+  type: ClusterIP
+  selector:
+    app: grafana
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000

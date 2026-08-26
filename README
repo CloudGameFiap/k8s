@@ -1,0 +1,11 @@
+## Observabilidade — Opção A
+
+Este repositório adota a Opção A de observabilidade, composta por Prometheus
+para coleta de métricas e Grafana para visualização.
+
+As APIs `user-api` e `catalog-api` expõem métricas no endpoint `/metrics` no
+formato Prometheus. O dashboard provisionado apresenta latência HTTP,
+contagem de requisições por serviço e código HTTP, além da taxa de erros 4xx
+e 5xx.
+
+Os manifests da stack estão em `observability.yaml`.

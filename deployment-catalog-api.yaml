@@ -21,7 +21,7 @@ spec:
           command: ['sh', '-c', 'until nc -z sqlserver 1433; do echo waiting for sqlserver; sleep 2; done']
       containers:
         - name: catalog-api
-          image: dpsnbsb79/cloudgamefiapcatalogapi:2.0
+          image: phsvicero/cloudgamefiapcatalogapi:prometheus-v1
           imagePullPolicy: Always
           resources:
             requests:
@@ -50,4 +50,4 @@ spec:
               path: /health
               port: 8080
             initialDelaySeconds: 30
-            periodSeconds: 20          
+            periodSeconds: 20
