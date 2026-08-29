@@ -47,6 +47,8 @@ services:
         condition: service_healthy
       sqlserver:
         condition: service_healthy
+      mongodb:
+        condition: service_healthy
     ports:
       - '57398:8080'
       - '57399:8081'
@@ -58,6 +60,10 @@ services:
       - Logging__LogLevel__Microsoft.Hosting.Lifetime= "Information"
       # Database connection string
       - ConnectionStrings__Default=${ConnectionStrings__CatalogApi}
+      # MongoDB Cache Settings
+      - MongoDb__ConnectionString=${MongoDb__ConnectionString}
+      - MongoDb__DatabaseName=${MongoDb__DatabaseName}
+      - MongoDb__CollectionName=${MongoDb__CollectionName}
       # RabbitMQ Settings
       - RabbitMq__Host=${RabbitMq__Host}
       - RabbitMq__Port=${RabbitMq__Port}
@@ -81,7 +87,7 @@ services:
       - Serilog__Enrich__2=${Serilog__Enrich__2}
     networks:
       - cloudgame-network
-  
+
   catalogconsumer:
     image: dpsnbsb79/cloudgamefiapcatalogconsumer:2.0
     container_name: cloudgame-consumer
@@ -90,12 +96,18 @@ services:
         condition: service_healthy
       sqlserver:
         condition: service_healthy
+      mongodb:
+        condition: service_healthy
     environment:
       # Logging Settings
       - Logging__LogLevel__Default= "Information"
       - Logging__LogLevel__Microsoft.Hosting.Lifetime= "Information"
       # Database connection string
       - ConnectionStrings__Default= ${ConnectionStrings__CatalogApi}
+      # MongoDB Cache
+      - MongoDb__ConnectionString=${MongoDb__ConnectionString}
+      - MongoDb__DatabaseName=${MongoDb__DatabaseName}
+      - MongoDb__CollectionName=${MongoDb__CollectionName}
       # RabbitMQ Settings
       - RabbitMq__Host= ${RabbitMq__Host}
       - RabbitMq__Port= ${RabbitMq__Port}
@@ -206,9 +218,26 @@ services:
       timeout: 5s
       retries: 5
 
+  mongodb:
+    image: mongo:8
+    container_name: cloudgame-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - cloudgame-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   sqlserver-data:
   rabbitmq-data:
+  mongodb_data:
 
 networks:
   cloudgame-network:
