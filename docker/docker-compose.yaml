@@ -60,10 +60,10 @@ services:
       - Logging__LogLevel__Microsoft.Hosting.Lifetime= "Information"
       # Database connection string
       - ConnectionStrings__Default=${ConnectionStrings__CatalogApi}
-      # MongoDB Cache Settings
-      - MongoDb__ConnectionString=${MongoDb__ConnectionString}
-      - MongoDb__DatabaseName=${MongoDb__DatabaseName}
-      - MongoDb__CollectionName=${MongoDb__CollectionName}
+      # MongoDbCache Cache Settings
+      - MongoDbCache__ConnectionString=${MongoDbCache__ConnectionString}
+      - MongoDbCache__DatabaseName=${MongoDbCache__DatabaseName}
+      - MongoDbCache__CollectionName=${MongoDbCache__CollectionName}
       # RabbitMQ Settings
       - RabbitMq__Host=${RabbitMq__Host}
       - RabbitMq__Port=${RabbitMq__Port}
@@ -105,9 +105,9 @@ services:
       # Database connection string
       - ConnectionStrings__Default= ${ConnectionStrings__CatalogApi}
       # MongoDB Cache
-      - MongoDb__ConnectionString=${MongoDb__ConnectionString}
-      - MongoDb__DatabaseName=${MongoDb__DatabaseName}
-      - MongoDb__CollectionName=${MongoDb__CollectionName}
+      - MongoDbCache__ConnectionString=${MongoDbCache__ConnectionString}
+      - MongoDbCache__DatabaseName=${MongoDbCache__DatabaseName}
+      - MongoDbCache__CollectionName=${MongoDbCache__CollectionName}
       # RabbitMQ Settings
       - RabbitMq__Host= ${RabbitMq__Host}
       - RabbitMq__Port= ${RabbitMq__Port}
