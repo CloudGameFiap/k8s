@@ -38,7 +38,7 @@ services:
       - cloudgame-network
 
   catalogapi:
-    image: dpsnbsb79/cloudgamefiapcatalogapi:2.0
+    image: igordeandradetudisco/cloudgamefiapcatalogapi:2 
     container_name: cloudgame-catalogapi
     depends_on:
       rabbitmq:
@@ -221,8 +221,10 @@ services:
     container_name: cloudgame-mongodb
     restart: unless-stopped
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MongoDbCache__DatabaseName}
+      MONGO_INITDB_ROOT_USERNAME: ${MongoDbCache__USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MongoDbCache__Password}
+    command: ["mongod", "--bind_ip_all", "--auth"]
     ports:
       - "27017:27017"
     volumes:
@@ -230,7 +232,8 @@ services:
     networks:
       - cloudgame-network
     healthcheck:
-      test: ["CMD", "mongosh", "-u", "${MONGODB_USER}", "-p", "${MONGODB_PASSWORD}", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
+      test:
+        ["CMD", "mongosh", "-u", "${MongoDbCache__USER}", "-p", "${MongoDbCache__Password}", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping').ok"]
       interval: 10s
       timeout: 5s
       retries: 5
