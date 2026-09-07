@@ -1,6 +1,6 @@
 services:
   paymentapi:
-    image: dpsnbsb79/payment-api:3.0
+    image: igordeandradetudisco/payment-api:2
     container_name: cloudgame-paymentapi
     depends_on:
       rabbitmq:
@@ -22,7 +22,7 @@ services:
       - cloudgame-network
 
   notificationapi:
-    image: dpsnbsb79/cloudgamefiapnotificationapi:5.0
+    image: igordeandradetudisco/cloudgamefiapnotificationapi:2
     container_name: cloudgame-notificationapi
     depends_on:
       rabbitmq:
@@ -87,7 +87,7 @@ services:
       - cloudgame-network
 
   catalogconsumer:
-    image: dpsnbsb79/cloudgamefiapcatalogconsumer:2.0
+    image: igordeandradetudisco/cloudgamefiapcatalogconsumer:2
     container_name: cloudgame-consumer
     depends_on:
       rabbitmq:
@@ -132,7 +132,7 @@ services:
       - cloudgame-network
 
   userapi:
-    image: dpsnbsb79/cloudgamefiapuserapi:2.0
+    image: igordeandradetudisco/cloudgamefiapuserapi:2
     container_name: cloudgame-userapi
     depends_on:
       rabbitmq:
