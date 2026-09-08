@@ -21,7 +21,7 @@ spec:
           command: ['sh', '-c', 'until nc -z sqlserver 1433; do echo waiting for sqlserver; sleep 2; done']
       containers:
         - name: user-api
-          image: dpsnbsb79/cloudgamefiapuserapi:2.0
+          image: igordeandradetudisco/cloudgamefiapuserapi:2
           resources:
             requests:
               memory: "512Mi"

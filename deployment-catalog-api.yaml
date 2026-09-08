@@ -21,7 +21,7 @@ spec:
           command: ['sh', '-c', 'until nc -z sqlserver 1433; do echo waiting for sqlserver; sleep 2; done']
       containers:
         - name: catalog-api
-          image: dpsnbsb79/cloudgamefiapcatalogapi:2.0
+          image: igordeandradetudisco/cloudgamefiapcatalogapi:2 
           imagePullPolicy: Always
           resources:
             requests:
