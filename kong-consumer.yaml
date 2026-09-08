@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloudgame-jwt-secret
+  labels:
+    konghq.com/credential: jwt
+stringData:
+  key: CloudGameApi
+  algorithm: HS512
+  secret: "q8vJc0RrYx3l0m2Y0pV-09jbwqergERWGrgtrTT!!@$i2q8vJc0RrYx3l0m2Y0pV+"
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongConsumer
+metadata:
+  name: cloudgame-users
+  annotations:
+    kubernetes.io/ingress.class: kong
+username: cloudgame-users
+credentials:
+  - cloudgame-jwt-secret
