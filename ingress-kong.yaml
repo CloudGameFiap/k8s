@@ -1,0 +1,145 @@
+# ---------------- USER API ----------------
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: user-api-login-ingress
+  annotations:
+    konghq.com/plugins: cors-allow,rate-limit-login
+spec:
+  ingressClassName: kong
+  rules:
+    - host: user.localhost
+      http:
+        paths:
+          - path: /api/auth/login
+            pathType: Prefix
+            backend:
+              service:
+                name: user-api
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: user-api-admin-ingress
+  annotations:
+    konghq.com/plugins: jwt-auth,admin-only,cors-allow,rate-limit-60
+spec:
+  ingressClassName: kong
+  rules:
+    - host: user.localhost
+      http:
+        paths:
+          - path: /admin
+            pathType: Prefix
+            backend:
+              service:
+                name: user-api
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: user-api-ingress
+  annotations:
+    konghq.com/methods: POST
+    konghq.com/plugins: cors-allow,rate-limit-60
+spec:
+  ingressClassName: kong
+  rules:
+    - host: user.localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: user-api
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: user-api-ingress
+  annotations:
+    konghq.com/methods: GET, PUT
+    konghq.com/plugins: jwt-auth,cors-allow,rate-limit-60
+spec:
+  ingressClassName: kong
+  rules:
+    - host: user.localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: user-api
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: user-api-ingress
+  annotations:
+    konghq.com/methods: DELETE
+    konghq.com/plugins: jwt-auth,admin-only,cors-allow,rate-limit-60
+spec:
+  ingressClassName: kong
+  rules:
+    - host: user.localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: user-api
+                port:
+                  number: 80
+---
+# ---------------- CATALOG API ----------------
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: catalog-api-admin-ingress
+  annotations:
+    konghq.com/methods: POST, PUT, PATCH
+    konghq.com/plugins: jwt-auth,admin-only,cors-allow,rate-limit-60
+spec:
+  ingressClassName: kong
+  rules:
+    - host: catalog.localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: catalog-api
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: catalog-api-admin-ingress
+  annotations:
+    konghq.com/plugins: jwt-auth,cors-allow,rate-limit-60
+spec:
+  ingressClassName: kong
+  rules:
+    - host: catalog.localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: catalog-api
+                port:
+                  number: 80

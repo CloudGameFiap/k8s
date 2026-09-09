@@ -1,0 +1,51 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: jwt-auth
+plugin: jwt
+config:
+  claims_to_verify:
+    - exp
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: rate-limit-60
+plugin: rate-limiting
+config:
+  minute: 60
+  policy: local
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: rate-limit-login
+plugin: rate-limiting
+config:
+  minute: 20
+  policy: local
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: cors-allow
+plugin: cors
+config:
+  origins:
+    - "*"
+  methods: [GET, POST, PUT, DELETE, OPTIONS]
+  headers: [Accept, Authorization, Content-Type]
+  credentials: true
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: admin-only
+plugin: pre-function
+config:
+  access:
+    - |
+      local jwt_claims = kong.ctx.shared.jwt_claims
+      if not jwt_claims or jwt_claims.role ~= "admin" then
+        return kong.response.exit(403, { message = "Acesso restrito a administradores" })
+      end
