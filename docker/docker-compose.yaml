@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   paymentapi:
-    image: dpsnbsb79/payment-api:3.0
+    image: igordeandradetudisco/payment-api:2
     container_name: cloudgame-paymentapi
     depends_on:
       rabbitmq:
@@ -24,7 +22,7 @@ services:
       - cloudgame-network
 
   notificationapi:
-    image: dpsnbsb79/cloudgamefiapnotificationapi:5.0
+    image: igordeandradetudisco/cloudgamefiapnotificationapi:2
     container_name: cloudgame-notificationapi
     depends_on:
       rabbitmq:
@@ -40,12 +38,14 @@ services:
       - cloudgame-network
 
   catalogapi:
-    image: phsvicero/cloudgamefiapcatalogapi:prometheus-v1
+    image: igordeandradetudisco/cloudgamefiapcatalogapi:2
     container_name: cloudgame-catalogapi
     depends_on:
       rabbitmq:
         condition: service_healthy
       sqlserver:
+        condition: service_healthy
+      mongodb:
         condition: service_healthy
     ports:
       - '57398:8080'
@@ -58,6 +58,10 @@ services:
       - Logging__LogLevel__Microsoft.Hosting.Lifetime= "Information"
       # Database connection string
       - ConnectionStrings__Default=${ConnectionStrings__CatalogApi}
+      # MongoDbCache Cache Settings
+      - MongoDbCache__ConnectionString=${MongoDbCache__ConnectionString}
+      - MongoDbCache__DatabaseName=${MongoDbCache__DatabaseName}
+      - MongoDbCache__CollectionName=${MongoDbCache__CollectionName}
       # RabbitMQ Settings
       - RabbitMq__Host=${RabbitMq__Host}
       - RabbitMq__Port=${RabbitMq__Port}
@@ -81,14 +85,16 @@ services:
       - Serilog__Enrich__2=${Serilog__Enrich__2}
     networks:
       - cloudgame-network
-  
+
   catalogconsumer:
-    image: dpsnbsb79/cloudgamefiapcatalogconsumer:2.0
+    image: igordeandradetudisco/cloudgamefiapcatalogconsumer:2
     container_name: cloudgame-consumer
     depends_on:
       rabbitmq:
         condition: service_healthy
       sqlserver:
+        condition: service_healthy
+      mongodb:
         condition: service_healthy
     environment:
       # Logging Settings
@@ -96,6 +102,10 @@ services:
       - Logging__LogLevel__Microsoft.Hosting.Lifetime= "Information"
       # Database connection string
       - ConnectionStrings__Default= ${ConnectionStrings__CatalogApi}
+      # MongoDB Cache
+      - MongoDbCache__ConnectionString=${MongoDbCache__ConnectionString}
+      - MongoDbCache__DatabaseName=${MongoDbCache__DatabaseName}
+      - MongoDbCache__CollectionName=${MongoDbCache__CollectionName}
       # RabbitMQ Settings
       - RabbitMq__Host= ${RabbitMq__Host}
       - RabbitMq__Port= ${RabbitMq__Port}
@@ -122,7 +132,7 @@ services:
       - cloudgame-network
 
   userapi:
-    image: phsvicero/cloudgamefiapuserapi:prometheus-v1
+    image: igordeandradetudisco/cloudgamefiapuserapi:2
     container_name: cloudgame-userapi
     depends_on:
       rabbitmq:
@@ -206,6 +216,28 @@ services:
       timeout: 5s
       retries: 5
 
+  mongodb:
+    image: mongo:8
+    container_name: cloudgame-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: ${MongoDbCache__DatabaseName}
+      MONGO_INITDB_ROOT_USERNAME: ${MongoDbCache__USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MongoDbCache__Password}
+    command: ["mongod", "--bind_ip_all", "--auth"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - cloudgame-network
+    healthcheck:
+      test:
+        ["CMD", "mongosh", "-u", "${MongoDbCache__USER}", "-p", "${MongoDbCache__Password}", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      
   prometheus:
     image: prom/prometheus:v3.5.0
     container_name: cloudgame-prometheus
@@ -243,6 +275,7 @@ services:
 volumes:
   sqlserver-data:
   rabbitmq-data:
+  mongodb-data:
   prometheus-data:
   grafana-data:
 
