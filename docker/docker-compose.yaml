@@ -38,7 +38,7 @@ services:
       - cloudgame-network
 
   catalogapi:
-    image: igordeandradetudisco/cloudgamefiapcatalogapi:2 
+    image: igordeandradetudisco/cloudgamefiapcatalogapi:2
     container_name: cloudgame-catalogapi
     depends_on:
       rabbitmq:
@@ -237,11 +237,47 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    container_name: cloudgame-prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    depends_on:
+      - userapi
+      - catalogapi
+    networks:
+      - cloudgame-network
+
+  grafana:
+    image: grafana/grafana:12.1.0
+    container_name: cloudgame-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+    networks:
+      - cloudgame-network
 
 volumes:
   sqlserver-data:
   rabbitmq-data:
   mongodb-data:
+  prometheus-data:
+  grafana-data:
 
 networks:
   cloudgame-network:

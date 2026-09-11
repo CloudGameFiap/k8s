@@ -22,6 +22,7 @@ spec:
       containers:
         - name: user-api
           image: igordeandradetudisco/cloudgamefiapuserapi:2
+          imagePullPolicy: Always
           resources:
             requests:
               memory: "512Mi"
