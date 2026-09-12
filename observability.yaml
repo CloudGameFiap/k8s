@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: grafana-admin
+  namespace: observability
 type: Opaque
 stringData:
   username: admin
@@ -11,6 +12,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: prometheus-config
+  namespace: observability
 data:
   prometheus.yml: |
     global:
@@ -26,12 +28,13 @@ data:
       - job_name: catalog-api
         metrics_path: /metrics
         static_configs:
-          - targets: ["catalog-api:80"]
+          - targets: ["catalog-api:80"]      
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: prometheus
+  namespace: observability
 spec:
   replicas: 1
   selector:
@@ -47,21 +50,46 @@ spec:
           image: prom/prometheus:v3.5.0
           args:
             - --config.file=/etc/prometheus/prometheus.yml
+            - --storage.tsdb.path=/prometheus
           ports:
             - name: http
               containerPort: 9090
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: 9090
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: 9090
+            initialDelaySeconds: 15
+            periodSeconds: 20
           volumeMounts:
             - name: config
               mountPath: /etc/prometheus
+            - name: data
+              mountPath: /prometheus
       volumes:
         - name: config
           configMap:
             name: prometheus-config
+        - name: data
+          emptyDir: {}          
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: prometheus
+  namespace: observability
 spec:
   type: ClusterIP
   selector:
@@ -75,6 +103,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: grafana-datasource
+  namespace: observability
 data:
   prometheus.yaml: |
     apiVersion: 1
@@ -90,6 +119,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: grafana-dashboard-provider
+  namespace: observability
 data:
   provider.yaml: |
     apiVersion: 1
@@ -104,6 +134,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: grafana-dashboard
+  namespace: observability
 data:
   cloudgame-apis.json: |
     {
@@ -161,6 +192,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: grafana
+  namespace: observability
 spec:
   replicas: 1
   selector:
@@ -187,7 +219,28 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: grafana-admin
-                  key: password
+                  key: password            
+            - name: GF_DATABASE_WAL
+              value: "true"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
           volumeMounts:
             - name: datasource
               mountPath: /etc/grafana/provisioning/datasources
@@ -210,6 +263,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: grafana
+  namespace: observability
 spec:
   type: ClusterIP
   selector:
