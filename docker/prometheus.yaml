@@ -6,8 +6,9 @@ scrape_configs:
   - job_name: user-api
     metrics_path: /metrics
     static_configs:
-      - targets: ["user.localhost"]
+      - targets: ["user-api:80"]
+
   - job_name: catalog-api
     metrics_path: /metrics
     static_configs:
-      - targets: ["catalog.localhost"]
+      - targets: ["catalog-api:80"]

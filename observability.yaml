@@ -23,12 +23,12 @@ data:
       - job_name: user-api
         metrics_path: /metrics
         static_configs:
-          - targets: ["user.localhost"]
+          - targets: ["user-api.default.svc.cluster.local:80"]
 
       - job_name: catalog-api
         metrics_path: /metrics
         static_configs:
-          - targets: ["catalog.localhost"]      
+          - targets: ["catalog-api.default.svc.cluster.local:80"]     
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -112,7 +112,7 @@ data:
         uid: prometheus
         type: prometheus
         access: proxy
-        url: http://prometheus:9090
+        url: http://prometheus.observability.svc.cluster.local:9090
         isDefault: true
 ---
 apiVersion: v1
