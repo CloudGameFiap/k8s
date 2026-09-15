@@ -24,7 +24,7 @@ kind: Ingress
 metadata:
   name: user-api-admin-ingress
   annotations:
-    konghq.com/plugins: jwt-auth,admin-only,cors-allow,rate-limit-60
+    konghq.com/plugins: jwt-auth,cors-allow,rate-limit-60
 spec:
   ingressClassName: kong
   rules:
@@ -87,7 +87,7 @@ metadata:
   name: user-api-delete-ingress
   annotations:
     konghq.com/methods: DELETE
-    konghq.com/plugins: jwt-auth,admin-only,cors-allow,rate-limit-60
+    konghq.com/plugins: jwt-auth,cors-allow,rate-limit-60
 spec:
   ingressClassName: kong
   rules:
@@ -109,14 +109,35 @@ metadata:
   name: catalog-api-admin-write-ingress
   annotations:
     konghq.com/methods: POST, PUT, PATCH
-    konghq.com/plugins: jwt-auth,admin-only,cors-allow,rate-limit-60
+    konghq.com/plugins: jwt-auth,cors-allow,rate-limit-60
 spec:
   ingressClassName: kong
   rules:
     - host: catalog.localhost
       http:
         paths:
-          - path: /
+          - path: /api/games
+            pathType: Prefix
+            backend:
+              service:
+                name: catalog-api
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: catalog-api-addgame-write-ingress
+  annotations:
+    konghq.com/methods: POST
+    konghq.com/plugins: jwt-auth,cors-allow,rate-limit-60
+spec:
+  ingressClassName: kong
+  rules:
+    - host: catalog.localhost
+      http:
+        paths:
+          - path: /api/user-games
             pathType: Prefix
             backend:
               service:
