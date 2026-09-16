@@ -1,3 +1,10 @@
+## Visão geral
+
+Este repositório configura uma infraestrutura Kubernetes para a aplicação CloudGame,
+com suporte a banco de dados, cache, gateway de API e observabilidade. A estrutura
+inclui manifestos para deploy dos serviços da aplicação, além de recursos de
+infraestrutura e monitoramento.
+
 ## Observabilidade — Opção A
 
 Este repositório adota a Opção A de observabilidade, composta por Prometheus
@@ -9,3 +16,57 @@ contagem de requisições por serviço e código HTTP, além da taxa de erros 4x
 e 5xx.
 
 Os manifests da stack estão em `observability.yaml`.
+
+## Tecnologias e componentes principais
+
+### MongoDB
+
+O MongoDB é usado como banco de dados documental da aplicação, com deployment
+`mongo:8` em Kubernetes, armazenamento persistente em um PVC de 2Gi e probe de
+saúde para verificar disponibilidade do banco. O serviço expõe a porta 27017 e
+as credenciais são carregadas a partir de secrets do projeto, permitindo a
+configuração inicial do usuário, senha e database do MongoDB.
+
+### Redis
+
+O Redis é configurado como serviço de cache e armazenamento em memória da
+aplicação. Ele é implantado com a imagem `redis:7-alpine` e exposto no serviço
+na porta 6379, sendo acessível dentro do cluster por meio do nome `redis`.
+
+### Prometheus
+
+O Prometheus é responsável pela coleta e armazenamento das métricas das APIs.
+Ele é configurado com scrape em intervalos de 15 segundos e coleta dados dos
+endpoints `/metrics` de `user-api` e `catalog-api`, na porta 80 dos serviços
+dentro do cluster. A stack também define health checks em `/-/ready` e `/-/healthy`
+para garantir a disponibilidade do servidor de métricas.
+
+### Grafana
+
+O Grafana é a camada de visualização da observabilidade. Ele utiliza o
+Prometheus como datasource e inclui dashboards provisionados automaticamente
+para apresentar indicadores como requisições por segundo, latência p95,
+requisições por status HTTP e taxa de erros. A autenticação administrativa é
+configurada via secret, com usuário `admin` e senha definida no manifesto.
+
+### Kong
+
+O Kong atua como API Gateway e ingress controller da aplicação. Os manifests
+usam `ingressClassName: kong` e definem regras de roteamento para as APIs de
+usuário e catálogo, com autenticação JWT, CORS e rate limiting configurados por
+plugins. O projeto também inclui consumidores e plugins do Kong para validação
+JWT, controle de taxa por requisição e criação de regras específicas por rota,
+como login e endpoints administrativos.
+
+## Stack geral
+
+A arquitetura combina:
+
+- MongoDB para persistência documental
+- Redis para cache e dados em memória
+- Prometheus para coleta de métricas
+- Grafana para dashboards e visualização
+- Kong como gateway e camada de segurança de APIs
+
+Esses componentes complementam a aplicação do projeto e permitem tanto a
+persistência dos dados quanto a observabilidade operacional do ambiente.
