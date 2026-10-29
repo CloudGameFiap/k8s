@@ -17,6 +17,44 @@ e 5xx.
 
 Os manifests da stack estão em `observability.yaml`.
 
+### Exportação das métricas de API para o CloudWatch
+
+O manifesto `cloudwatch/prometheus-eks.yaml` instala um coletor CloudWatch Agent
+separado do Prometheus local. Ele consulta os endpoints internos `/metrics` de
+`user-api` e `catalog-api` a cada minuto e envia ao CloudWatch as métricas
+`http_requests_received_total`, incluindo a dimensão `code` para separar os
+status HTTP.
+
+Pré-requisitos:
+
+- O add-on `amazon-cloudwatch-observability` deve estar instalado no cluster.
+- A ServiceAccount `cloudwatch-agent`, no namespace `amazon-cloudwatch`, deve
+  ter uma role IAM associada com a política `CloudWatchAgentServerPolicy`.
+- Os serviços `user-api` e `catalog-api` devem estar acessíveis na porta 80 e
+  expor `/metrics` dentro do cluster.
+
+Para instalar ou atualizar o coletor, execute na raiz deste repositório:
+
+```powershell
+kubectl apply -f .\cloudwatch\prometheus-eks.yaml
+```
+
+Confira o pod e os logs do coletor:
+
+```powershell
+kubectl get pods -n amazon-cloudwatch -l app=cloudgame-cwagent-prometheus
+kubectl logs -n amazon-cloudwatch deployment/cloudgame-cwagent-prometheus
+```
+
+As métricas publicadas ficam no namespace `ContainerInsights/Prometheus` do
+CloudWatch, na região do cluster. A coleta Prometheus do CloudWatch Agent aceita
+contadores, gauges e summaries; histogramas Prometheus são descartados. Por
+isso, a métrica de buckets usada pelo painel de latência p95 atual não é enviada
+por este coletor. Para manter a consulta p95 em PromQL na AWS, use Amazon Managed
+Service for Prometheus (AMP) com `remote_write`. Os painéis do Grafana também não
+são copiados automaticamente: é preciso criar os painéis correspondentes no
+CloudWatch.
+
 ## Tecnologias e componentes principais
 
 ### MongoDB
