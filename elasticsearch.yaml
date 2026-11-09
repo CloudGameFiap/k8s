@@ -1,0 +1,51 @@
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: cloudgame-es
+  namespace: cloudgame
+spec:
+  version: 8.15.0
+  http:
+    tls:
+      selfSignedCertificate:
+        disabled: true          # HTTP puro local: dispensa lidar com certificado
+  nodeSets:
+  - name: default
+    count: 1
+    config:
+      node.store.allow_mmap: false
+      xpack.ml.enabled: false
+    podTemplate:
+      spec:
+        containers:
+        - name: elasticsearch
+          env:
+          - name: ES_JAVA_OPTS
+            value: "-Xms1g -Xmx1g"
+          resources:
+            requests: { memory: 2Gi, cpu: "1" }
+            limits:   { memory: 2Gi, cpu: "2" }
+    volumeClaimTemplates:
+    - metadata:
+        name: elasticsearch-data
+      spec:
+        accessModes: [ReadWriteOnce]
+        storageClassName: hostpath
+        resources:
+          requests:
+            storage: 5Gi
+---
+apiVersion: kibana.k8s.elastic.co/v1
+kind: Kibana
+metadata:
+  name: cloudgame-kb
+  namespace: cloudgame
+spec:
+  version: 8.15.0
+  count: 1
+  elasticsearchRef:
+    name: cloudgame-es
+  http:
+    tls:
+      selfSignedCertificate:
+        disabled: true

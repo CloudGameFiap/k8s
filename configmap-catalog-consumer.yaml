@@ -6,3 +6,6 @@ data:
   ASPNETCORE_URLS: http://+:8080
   ASPNETCORE_ENVIRONMENT: Production
   RabbitMq__Host: rabbitmq
+  Elasticsearch__Url: http://elasticsearch:9200
+  Elasticsearch__IndexName: games
+  Elasticsearch__NumberOfReplicas: "0"

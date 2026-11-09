@@ -61,6 +61,7 @@ spec:
                 - --eval
                 - "db.adminCommand('ping')"
             initialDelaySeconds: 15
+            timeoutSeconds: 5
             periodSeconds: 10
             failureThreshold: 5
       volumes:

@@ -1,0 +1,18 @@
+admin:
+  enabled: true
+  type: NodePort
+  http:
+    enabled: true
+    servicePort: 8001
+    nodePort: 30001
+
+manager:
+  type: NodePort
+  http:
+    enabled: true
+    servicePort: 8002
+    nodePort: 30002
+
+env:
+  admin_gui_url: http://localhost:30002
+  admin_gui_api_url: http://localhost:30001

@@ -145,6 +145,29 @@ spec:
                 port:
                   number: 80
 ---
+# Busca (Elasticsearch) é pública na API (AllowAnonymous) — sem jwt-auth no Kong.
+# Path mais específico que "/" tem precedência sobre o catalog-api-read-ingress.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: catalog-api-search-ingress
+  annotations:
+    konghq.com/methods: GET
+    konghq.com/plugins: cors-allow,rate-limit-60
+spec:
+  ingressClassName: kong
+  rules:
+    - host: catalog.localhost
+      http:
+        paths:
+          - path: /api/games/search
+            pathType: Prefix
+            backend:
+              service:
+                name: catalog-api
+                port:
+                  number: 80
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
