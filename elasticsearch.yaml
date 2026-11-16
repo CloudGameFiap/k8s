@@ -1,0 +1,45 @@
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: cloudgame-es
+  namespace: cloudgame
+spec:
+  version: 8.15.0
+  http:
+    tls:
+      selfSignedCertificate:
+        disabled: true       # HTTP interno, simplifica as APIs .NET
+  nodeSets:
+    - name: default
+      count: 1
+      config:
+        node.store.allow_mmap: false
+      podTemplate:
+        spec:
+          containers:
+            - name: elasticsearch
+              resources:
+                requests: { memory: 2Gi, cpu: 500m }
+                limits:   { memory: 2Gi }
+          # Sem disco EBS: o indice vive no pod (se o pod reiniciar, e preciso reindexar).
+          # O volume precisa se chamar exatamente "elasticsearch-data".
+          volumes:
+            - name: elasticsearch-data
+              emptyDir: {}
+---
+apiVersion: kibana.k8s.elastic.co/v1
+kind: Kibana
+metadata:
+  name: cloudgame-kb
+  namespace: cloudgame
+spec:
+  version: 8.15.0
+  count: 1
+  elasticsearchRef:
+    name: cloudgame-es
+  http:
+    service:
+      spec:
+        type: LoadBalancer
+        loadBalancerSourceRanges:
+          - 187.56.59.234/32   # troque pelo seu IP atual (Invoke-RestMethod https://api.ipify.org)

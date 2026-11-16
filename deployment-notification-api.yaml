@@ -22,7 +22,7 @@ spec:
           command: ['sh', '-c', 'until nc -z rabbitmq 5672; do echo waiting for rabbitmq; sleep 2; done']          
       containers: 
         - name:  notification-api 
-          image: igordeandradetudisco/cloudgamefiapnotificationapi:2
+          image: 297797204483.dkr.ecr.us-east-1.amazonaws.com/notification-api:latest
           resources:
             requests:
               memory: "512Mi"
@@ -36,4 +36,4 @@ spec:
             - configMapRef:
                 name: notification-api-config
             - secretRef:
-                name: notification-api-secret
+                name: infra-secret

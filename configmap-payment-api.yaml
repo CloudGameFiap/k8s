@@ -7,5 +7,7 @@ data:
   ASPNETCORE_ENVIRONMENT: Production
   RabbitMQ__Host: rabbitmq
   RabbitMQ__Port: "5672"
+  RabbitMq__Username: "admin"
   PaymentProcessing__ApprovalPercentage: "80"
   PaymentProcessing__DefaultPaymentType: CreditCard
+  

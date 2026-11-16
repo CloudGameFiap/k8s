@@ -13,15 +13,12 @@ spec:
         app: user-api
     spec:
       initContainers:
-        - name: wait-for-rabbitmq
-          image: busybox:1.36
-          command: ['sh', '-c', 'until nc -z rabbitmq 5672; do echo waiting for rabbitmq; sleep 2; done']
         - name: wait-for-sqlserver
           image: busybox:1.36
           command: ['sh', '-c', 'until nc -z sqlserver 1433; do echo waiting for sqlserver; sleep 2; done']
       containers:
         - name: user-api
-          image: danielrsantos/userapi:latest
+          image: 297797204483.dkr.ecr.us-east-1.amazonaws.com/cloudgame/user-api:latest
           imagePullPolicy: Always
           resources:
             requests:

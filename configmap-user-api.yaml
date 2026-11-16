@@ -4,5 +4,30 @@ metadata:
   name: user-api-config
 data:
   ASPNETCORE_URLS: http://+:8080
-  ASPNETCORE_ENVIRONMENT: Production
-  RabbitMq__Host: rabbitmq
+  ASPNETCORE_ENVIRONMENT: Development
+
+  JwtSettings__Audience: "CloudGameAudience"
+  JwtSettings__Issuer: "CloudGameApi"
+  JwtSettings__ExpiresInMinutes: "60"
+
+  RabbitMq__Host: "rabbitmq"
+  RabbitMq__Port: "5672"
+  RabbitMq__Username: "admin"
+  RabbitMq__UseSsl: "false"
+
+  AppDefaultUserAdmin__Email: "admin@cloudgame.com"
+  AppDefaultUserAdmin__Name: "Admin"
+
+  Logging__LogLevel__Default: "Information"
+  Logging__LogLevel__Microsoft.Hosting.Lifetime: "Information"
+  Serilog__MinimumLevel__Default: "Information"
+  Serilog__MinimumLevel__Override__Microsoft: "Warning"
+  Serilog__MinimumLevel__Override__System: "Warning"
+  Serilog__WriteTo__0__Name: "Console"
+  Serilog__WriteTo__1__Name: "File"
+  Serilog__WriteTo__1__Args__path: "Logs/log-.txt"
+  Serilog__WriteTo__1__Args__rollingInterval: "Day"
+  Serilog__WriteTo__1__Args__retainedFileCountLimit: "30"
+  Serilog__Enrich__0: "FromLogContext"
+  Serilog__Enrich__1: "WithMachineName"
+  Serilog__Enrich__2: "WithThreadId"

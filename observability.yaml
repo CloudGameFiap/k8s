@@ -1,13 +1,11 @@
 apiVersion: v1
-kind: Secret
+kind: Namespace
 metadata:
-  name: grafana-admin
-  namespace: observability
-type: Opaque
-stringData:
-  username: admin
-  password: admin123
+  name: observability
 ---
+# O Secret "grafana-admin" NAO fica neste arquivo (sem senha no repositorio).
+# Ele e criado por fora, a partir do grafana.env:
+#   kubectl create secret generic grafana-admin -n observability --from-env-file=grafana.env
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -28,7 +26,7 @@ data:
       - job_name: catalog-api
         metrics_path: /metrics
         static_configs:
-          - targets: ["catalog-api.default.svc.cluster.local:80"]     
+          - targets: ["catalog-api.default.svc.cluster.local:80"]
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -83,7 +81,7 @@ spec:
           configMap:
             name: prometheus-config
         - name: data
-          emptyDir: {}          
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
@@ -219,7 +217,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: grafana-admin
-                  key: password            
+                  key: password
             - name: GF_DATABASE_WAL
               value: "true"
           resources:
@@ -265,7 +263,9 @@ metadata:
   name: grafana
   namespace: observability
 spec:
-  type: ClusterIP
+  type: LoadBalancer
+  loadBalancerSourceRanges:
+  - 187.56.59.234/32
   selector:
     app: grafana
   ports:
