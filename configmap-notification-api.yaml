@@ -5,3 +5,5 @@ metadata:
 data:
   ASPNETCORE_ENVIRONMENT: "Production"
   RabbitMQ__HostName: "rabbitmq"
+  RabbitMq__Port: "5672"
+  RabbitMq__Username: "admin"

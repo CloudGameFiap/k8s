@@ -65,8 +65,7 @@ spec:
             failureThreshold: 5
       volumes:
         - name: mongodb-data
-          persistentVolumeClaim:
-            claimName: mongodb-data
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service

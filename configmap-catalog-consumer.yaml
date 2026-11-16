@@ -5,4 +5,36 @@ metadata:
 data:
   ASPNETCORE_URLS: http://+:8080
   ASPNETCORE_ENVIRONMENT: Production
-  RabbitMq__Host: rabbitmq
+  
+  RabbitMq__Host: "rabbitmq"
+  RabbitMq__Port: "5672"
+  RabbitMq__Username: "admin"
+  RabbitMq__UseSsl: "false"
+
+  Elasticsearch__Url: http://cloudgame-es-es-http.cloudgame.svc.cluster.local:9200
+  Elasticsearch__IndexName: games
+  Elasticsearch__NumberOfReplicas: "0"
+  # Logging Settings
+  Logging__LogLevel__Default: "Information"
+  Logging__LogLevel__Microsoft.Hosting.Lifetime: "Information"
+
+  # Default User data
+  AppDefaultUserAdmin__Email: "admin@cloudgame.com"
+  AppDefaultUserAdmin__Name: "Admin"
+
+  # Serilog
+  Serilog__MinimumLevel__Default: "Information"
+  Serilog__MinimumLevel__Override__Microsoft: "Warning"
+  Serilog__MinimumLevel__Override__System: "Warning"
+
+  Serilog__WriteTo__0__Name: "Console"
+
+  Serilog__WriteTo__1__Name: "File"
+  Serilog__WriteTo__1__Args__path: "Logs/log-.txt"
+  Serilog__WriteTo__1__Args__rollingInterval: "Day"
+  Serilog__WriteTo__1__Args__retainedFileCountLimit: "30"
+  Serilog__WriteTo__1__Args__outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {SourceContext} - {Message:lj}{NewLine}{Exception}"
+
+  Serilog__Enrich__0: "FromLogContext"
+  Serilog__Enrich__1: "WithMachineName"
+  Serilog__Enrich__2: "WithThreadId"
